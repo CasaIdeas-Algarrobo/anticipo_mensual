@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Anticipo Mensual">
+  <meta name="theme-color" content="#0a0f1e">
+  <title>Anticipo Mensual – Algarrobo</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --azul-900:#1e293b; --azul-700:#1d4ed8; --azul-600:#2563eb; --azul-500:#2563eb;
+      --azul-400:#3b82f6; --azul-300:#93c5fd; --azul-100:#dbeafe; --azul-50:#eff6ff;
+      --cian:#2563eb; --blanco:#ffffff;
+      --gris-900:#111827; --gris-700:#374151; --gris-500:#6b7280;
+      --gris-200:#e5e7eb; --gris-100:#f3f4f6; --gris-50:#f9fafb; --fondo:#f0f2f5;
+      --verde:#16a34a; --verde-bg:#dcfce7; --amarillo:#d97706; --amarillo-bg:#fef3c7;
+      --rojo:#dc2626; --rojo-bg:#fee2e2;
+      --font:'Segoe UI', system-ui, -apple-system, sans-serif; --radio:14px;
+      --sombra:0 4px 24px rgba(0,0,0,0.18); --sombra-lg:0 8px 40px rgba(0,0,0,0.28);
+    }
+    html { height:100%; -webkit-text-size-adjust:100%; }
+    body { font-family:var(--font); background:var(--fondo); min-height:100vh; color:var(--gris-900);
+      display:flex; flex-direction:column; padding-top:env(safe-area-inset-top); padding-bottom:env(safe-area-inset-bottom); }
+
+    .header { background:var(--blanco); box-shadow:0 1px 8px rgba(0,0,0,0.07); position:sticky; top:0; z-index:50; border-bottom:1px solid var(--gris-200); }
+    .header-inner { max-width:680px; margin:0 auto; padding:14px 20px; display:flex; align-items:center; gap:14px; }
+    .logo-wrap { flex-shrink:0; background:var(--gris-50); border:1px solid var(--gris-200); border-radius:10px; padding:7px 11px; }
+    .logo { height:36px; width:auto; object-fit:contain; display:block; }
+    .header-text { flex:1; min-width:0; }
+    .header-eyebrow { font-size:9px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase; color:var(--azul-500); margin-bottom:2px; }
+    .header-title { font-size:20px; font-weight:900; color:var(--gris-900); letter-spacing:-0.5px; line-height:1; }
+    .header-loc { font-size:11px; color:var(--gris-500); margin-top:3px; font-weight:500; }
+    .header-user { display:none; flex-direction:column; align-items:flex-end; gap:2px; }
+    .header-user.show { display:flex; }
+    .hu-name { font-size:12px; font-weight:700; color:var(--gris-900); max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .btn-salir { background:var(--gris-100); border:1px solid var(--gris-200); color:var(--gris-700); font-size:11px; font-weight:700; padding:4px 10px; border-radius:14px; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+
+    .main { flex:1; max-width:680px; width:100%; margin:0 auto; padding:18px 16px 48px; display:flex; flex-direction:column; gap:14px; }
+
+    .card { background:var(--blanco); border-radius:var(--radio); padding:18px; box-shadow:var(--sombra); border:1px solid var(--gris-200); }
+    .eyebrow { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:var(--azul-500); margin-bottom:12px; display:flex; align-items:center; gap:6px; }
+    .eyebrow::before { content:''; display:block; width:3px; height:14px; background:var(--azul-500); border-radius:2px; }
+    .muted { color:var(--gris-500); font-size:13px; line-height:1.5; }
+    h2.card-title { font-size:18px; font-weight:900; letter-spacing:-0.3px; margin-bottom:6px; }
+    h3.card-title { font-size:15px; font-weight:800; margin-bottom:12px; }
+
+    .field { display:flex; flex-direction:column; gap:6px; }
+    .field-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--gris-500); }
+    select, input[type=text], input[type=number], input[type=password] { padding:13px 14px; border:2px solid var(--gris-200); border-radius:11px; font-size:16px;
+      font-family:var(--font); color:var(--gris-900); background:var(--gris-50); outline:none; -webkit-appearance:none; width:100%; }
+    select:focus, input:focus { border-color:var(--azul-400); background:var(--blanco); box-shadow:0 0 0 4px rgba(59,130,246,0.1); }
+
+    .btn { padding:14px 20px; border:none; border-radius:11px; font-size:15px; font-weight:700; cursor:pointer; font-family:var(--font); min-height:50px;
+      -webkit-tap-highlight-color:transparent; transition:all .15s; display:inline-flex; align-items:center; justify-content:center; gap:6px; white-space:nowrap; width:100%; }
+    .btn:active { transform:scale(0.98); opacity:0.92; }
+    .btn:disabled { opacity:0.5; cursor:not-allowed; }
+    .btn.primary { background:linear-gradient(135deg, var(--azul-600), var(--azul-500)); color:var(--blanco); box-shadow:0 4px 14px rgba(29,78,216,0.35); }
+    .btn.ghost { background:var(--gris-100); color:var(--gris-700); border:2px solid var(--gris-200); }
+    .btn.verde { background:linear-gradient(135deg,#15803d,var(--verde)); color:#fff; box-shadow:0 4px 14px rgba(22,163,74,0.3); }
+
+    .feedback { font-size:13px; margin-top:10px; min-height:18px; font-weight:600; }
+    .feedback.ok { color:var(--verde); }
+    .feedback.error { color:var(--rojo); }
+
+    /* Banner de ventana */
+    .ventana { display:flex; align-items:center; gap:12px; padding:14px 16px; border-radius:12px; margin-bottom:2px; }
+    .ventana.ok { background:var(--verde-bg); }
+    .ventana.cerrada { background:var(--rojo-bg); }
+    .ventana .vic { font-size:24px; }
+    .ventana .vt { font-size:13px; font-weight:700; line-height:1.35; }
+    .ventana.ok .vt { color:#15803d; }
+    .ventana.cerrada .vt { color:var(--rojo); }
+
+    /* Info colaborador */
+    .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:4px; }
+    .info-field { background:var(--gris-50); border:1.5px solid var(--gris-200); border-radius:11px; padding:12px 14px; }
+    .info-field.span2 { grid-column:1 / -1; }
+    .if-label { font-size:9px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--gris-500); margin-bottom:5px; }
+    .if-value { font-size:15px; font-weight:700; color:var(--gris-900); line-height:1.3; }
+    .rol-pill { display:inline-block; padding:3px 12px; border-radius:20px; font-size:11px; font-weight:800; background:var(--azul-100); color:var(--azul-700); letter-spacing:0.3px; }
+    .tope-num { font-size:26px; font-weight:900; color:var(--azul-700); letter-spacing:-0.5px; }
+
+    /* Monto grande */
+    .monto-input-wrap { position:relative; margin-top:4px; }
+    .monto-signo { position:absolute; left:16px; top:50%; transform:translateY(-50%); font-size:26px; font-weight:900; color:var(--gris-500); pointer-events:none; }
+    #input-monto { font-size:30px; font-weight:900; letter-spacing:-0.5px; padding:16px 16px 16px 40px; color:var(--gris-900); }
+    .monto-hint { font-size:12px; color:var(--gris-500); margin-top:8px; font-weight:600; }
+    .chips { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+    .chip { flex:1 1 auto; padding:10px 12px; border:2px solid var(--gris-200); border-radius:10px; background:var(--gris-50); font-family:var(--font);
+      font-size:13px; font-weight:700; color:var(--gris-700); cursor:pointer; -webkit-tap-highlight-color:transparent; }
+    .chip:active { background:var(--azul-100); border-color:var(--azul-400); }
+
+    /* Solicitud confirmada */
+    .confirmada { background:linear-gradient(135deg, var(--azul-900), var(--azul-600)); color:#fff; border-radius:14px; padding:20px; }
+    .confirmada .ok-ic { font-size:32px; }
+    .confirmada .ct { font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--azul-300); font-weight:700; margin-top:8px; }
+    .confirmada .cmonto { font-size:38px; font-weight:900; letter-spacing:-1px; line-height:1; margin-top:4px; }
+    .confirmada .cinfo { font-size:13px; color:rgba(255,255,255,0.85); margin-top:10px; line-height:1.5; }
+
+    /* Tabla export */
+    .table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; border-radius:10px; border:1px solid var(--gris-200); margin-top:4px; }
+    table { width:100%; border-collapse:collapse; font-size:13px; }
+    thead th { background:var(--gris-50); text-align:left; padding:10px 12px; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; color:var(--gris-500); border-bottom:1px solid var(--gris-200); white-space:nowrap; }
+    tbody td { padding:10px 12px; border-bottom:1px solid var(--gris-100); color:var(--gris-900); vertical-align:middle; }
+    tbody tr:last-child td { border-bottom:none; }
+    td.monto { font-weight:700; font-family:monospace; white-space:nowrap; }
+    .export-actions { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
+    .export-actions .btn { flex:1 1 140px; width:auto; }
+
+    .footer { text-align:center; padding:16px; font-size:11px; color:var(--gris-500); border-top:1px solid var(--gris-200); background:var(--blanco); padding-bottom:calc(16px + env(safe-area-inset-bottom)); }
+
+    .hidden { display:none !important; }
+
+    @media (max-width:480px) {
+      .header-title { font-size:17px; }
+      .main { padding:14px 12px 36px; gap:12px; }
+      .card { padding:16px; }
+      .info-grid { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo-wrap">
+        <img src="https://www.casaideas.com.bo/static/media/logo.40b7cd09.png" alt="Casaideas" class="logo" onerror="this.style.display='none'"/>
+      </div>
+      <div class="header-text">
+        <div class="header-eyebrow">Recursos Humanos</div>
+        <div class="header-title">Anticipo Mensual</div>
+        <div class="header-loc">📍 Algarrobo</div>
+      </div>
+      <div class="header-user" id="header-user">
+        <span class="hu-name" id="hu-name">—</span>
+        <button class="btn-salir" id="btn-salir">Salir</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- ═══════════ LOGIN ═══════════ -->
+    <section id="login-panel">
+      <div class="card">
+        <div class="eyebrow">Ingreso</div>
+        <h2 class="card-title">Solicitar anticipo</h2>
+        <p class="muted">Selecciona tu nombre e ingresa tu PIN para continuar.</p>
+        <div class="field" style="margin-top:14px;">
+          <span class="field-label">Colaborador</span>
+          <select id="select-colaborador"></select>
+        </div>
+        <div class="field" style="margin-top:12px;">
+          <span class="field-label">PIN</span>
+          <input id="input-pin" type="password" inputmode="numeric" placeholder="••••" autocomplete="off"/>
+        </div>
+        <div style="margin-top:16px;">
+          <button id="btn-login" class="btn primary">Ingresar</button>
+        </div>
+        <p id="login-feedback" class="feedback"></p>
+      </div>
+    </section>
+
+    <!-- ═══════════ APP (post-login) ═══════════ -->
+    <section id="app-panel" class="hidden">
+
+      <div id="ventana-banner" class="ventana ok">
+        <span class="vic">🗓️</span>
+        <span class="vt" id="ventana-text">—</span>
+      </div>
+
+      <div class="card">
+        <div class="eyebrow">Tus datos</div>
+        <div class="info-grid">
+          <div class="info-field span2">
+            <div class="if-label">Colaborador</div>
+            <div class="if-value" id="info-nombre">—</div>
+          </div>
+          <div class="info-field">
+            <div class="if-label">RUT</div>
+            <div class="if-value" id="info-rut" style="font-family:monospace">—</div>
+          </div>
+          <div class="info-field">
+            <div class="if-label">Cargo</div>
+            <div class="if-value"><span class="rol-pill" id="info-rol">—</span></div>
+          </div>
+          <div class="info-field span2">
+            <div class="if-label">Monto máximo que puedes solicitar</div>
+            <div class="tope-num" id="info-tope">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulario de solicitud -->
+      <div class="card" id="form-card">
+        <div class="eyebrow">Monto a solicitar</div>
+        <div class="monto-input-wrap">
+          <span class="monto-signo">$</span>
+          <input id="input-monto" type="text" inputmode="numeric" placeholder="0"/>
+        </div>
+        <div class="monto-hint" id="monto-hint">—</div>
+        <div class="chips" id="chips"></div>
+        <div style="margin-top:16px;">
+          <button id="btn-solicitar" class="btn primary">Enviar solicitud</button>
+        </div>
+        <p id="solicitar-feedback" class="feedback"></p>
+      </div>
+
+      <!-- Solicitud ya realizada -->
+      <div class="card hidden" id="confirmada-card">
+        <div class="confirmada">
+          <div class="ok-ic">✅</div>
+          <div class="ct">Solicitud registrada este mes</div>
+          <div class="cmonto" id="conf-monto">—</div>
+          <div class="cinfo" id="conf-info">—</div>
+        </div>
+      </div>
+
+      <!-- Export (solo jefe/admin) -->
+      <div class="card hidden" id="admin-card">
+        <div class="eyebrow">Administración</div>
+        <h3 class="card-title">Solicitudes registradas</h3>
+        <p class="muted">Descarga el archivo con nombre, RUT, cargo, monto y fecha para enviarlo.</p>
+        <div class="export-actions">
+          <button id="btn-cargar-export" class="btn ghost">Ver solicitudes</button>
+          <button id="btn-descargar-csv" class="btn verde hidden">⬇ Descargar CSV</button>
+        </div>
+        <div id="export-tabla-wrap" class="hidden">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Fecha</th><th>Nombre</th><th>RUT</th><th>Cargo</th><th>Monto</th></tr></thead>
+              <tbody id="export-body"></tbody>
+            </table>
+          </div>
+          <p class="muted" id="export-count" style="margin-top:8px;"></p>
+        </div>
+        <p id="admin-feedback" class="feedback"></p>
+      </div>
+
+    </section>
+  </main>
+
+  <footer class="footer">Anticipo Mensual &nbsp;·&nbsp; CasaIdeas Algarrobo</footer>
+
+  <script>
+  'use strict';
+
+  /* ═══════════════════════════════════════════════
+     CONFIG — PEGA AQUÍ LA URL /exec DE TU WEB APP DE ANTICIPO
+     ═══════════════════════════════════════════════ */
+  const API = 'https://script.google.com/macros/s/PEGA_AQUI_TU_URL_DE_ANTICIPO/exec';
+
+  async function apiGet(action, params = {}) {
+    const url = new URL(API);
+    url.searchParams.set('action', action);
+    Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
+    const res = await fetch(url.toString());
+    return res.json();
+  }
+  async function apiPost(action, payload = {}) {
+    const res = await fetch(API, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body: JSON.stringify({ action, ...payload }) });
+    return res.json();
+  }
+  function esc(s) { return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function clp(n) { return '$' + (Number(n)||0).toLocaleString('es-CL'); }
+
+  let sesion = { nombre:'', pin:'', rut:'', rol:'', tope:0, esAdmin:false };
+  let ultimoExport = [];
+
+  /* ── Cargar colaboradores en el select ── */
+  async function cargarColaboradores() {
+    const sel = document.getElementById('select-colaborador');
+    try {
+      const r = await apiGet('colaboradores');
+      const cols = (r && r.colaboradores) || [];
+      sel.innerHTML = cols.map(c => `<option value="${esc(c.nombre)}">${esc(c.nombre)} — ${esc(c.rol)}</option>`).join('');
+    } catch (e) {
+      sel.innerHTML = '<option>Error de conexión</option>';
+    }
+  }
+
+  /* ── Login ── */
+  document.getElementById('btn-login').addEventListener('click', login);
+  document.getElementById('input-pin').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+
+  async function login() {
+    const nombre = document.getElementById('select-colaborador').value;
+    const pin = document.getElementById('input-pin').value.trim();
+    const fb = document.getElementById('login-feedback');
+    if (!pin) { document.getElementById('input-pin').focus(); return; }
+    fb.textContent = 'Verificando…'; fb.className = 'feedback';
+    const btn = document.getElementById('btn-login'); btn.disabled = true;
+    let resp;
+    try { resp = await apiPost('login', { nombre, pin }); }
+    catch (e) { fb.textContent = 'Error de conexión'; fb.className = 'feedback error'; btn.disabled = false; return; }
+    btn.disabled = false;
+    if (!resp.success) { fb.textContent = resp.message || 'No se pudo ingresar'; fb.className = 'feedback error'; document.getElementById('input-pin').select(); return; }
+    fb.textContent = '';
+    sesion = { nombre, pin, rut: resp.colaborador.rut, rol: resp.colaborador.rol, tope: resp.colaborador.tope, esAdmin: resp.esAdmin };
+    entrarApp(resp);
+  }
+
+  function entrarApp(resp) {
+    document.getElementById('login-panel').classList.add('hidden');
+    document.getElementById('app-panel').classList.remove('hidden');
+    document.getElementById('header-user').classList.add('show');
+    document.getElementById('hu-name').textContent = sesion.nombre.split(' ').slice(-2).join(' ');
+
+    document.getElementById('info-nombre').textContent = sesion.nombre;
+    document.getElementById('info-rut').textContent = sesion.rut;
+    document.getElementById('info-rol').textContent = sesion.rol;
+    document.getElementById('info-tope').textContent = clp(sesion.tope);
+
+    /* Banner de ventana */
+    const v = resp.ventana;
+    const banner = document.getElementById('ventana-banner');
+    const vt = document.getElementById('ventana-text');
+    if (v.abierta) {
+      banner.className = 'ventana ok';
+      vt.textContent = `Plazo abierto · hoy ${v.fecha}. Puedes solicitar hasta el día ${v.diaLimite}.`;
+    } else {
+      banner.className = 'ventana cerrada';
+      vt.textContent = `Fuera de plazo · hoy es ${v.fecha}. El anticipo solo se solicita del día 1 al ${v.diaLimite}.`;
+    }
+
+    /* Estado del formulario */
+    const formCard = document.getElementById('form-card');
+    const confCard = document.getElementById('confirmada-card');
+    if (resp.yaSolicito && resp.solicitud) {
+      formCard.classList.add('hidden');
+      confCard.classList.remove('hidden');
+      document.getElementById('conf-monto').textContent = clp(resp.solicitud.monto);
+      document.getElementById('conf-info').textContent = `${sesion.nombre} · RUT ${sesion.rut} · solicitado el ${resp.solicitud.fecha}`;
+    } else if (!v.abierta) {
+      formCard.classList.add('hidden');
+      confCard.classList.add('hidden');
+    } else {
+      formCard.classList.remove('hidden');
+      confCard.classList.add('hidden');
+      prepararFormulario();
+    }
+
+    /* Admin */
+    document.getElementById('admin-card').classList.toggle('hidden', !sesion.esAdmin);
+  }
+
+  /* ── Formulario de monto ── */
+  const inputMonto = document.getElementById('input-monto');
+  function prepararFormulario() {
+    document.getElementById('monto-hint').textContent = 'Máximo para tu cargo: ' + clp(sesion.tope);
+    inputMonto.value = '';
+    /* chips: máximo, mitad, y tope exacto */
+    const chips = document.getElementById('chips');
+    const mitad = Math.round(sesion.tope / 2 / 1000) * 1000;
+    const opts = [mitad, sesion.tope];
+    chips.innerHTML = opts.map(v => `<button type="button" class="chip" data-v="${v}">${clp(v)}</button>`).join('') +
+      `<button type="button" class="chip" data-v="${sesion.tope}">Máximo</button>`;
+    chips.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => { inputMonto.value = Number(c.dataset.v).toLocaleString('es-CL'); }));
+  }
+  inputMonto.addEventListener('input', function() {
+    let n = this.value.replace(/\D/g, '');
+    this.value = n ? Number(n).toLocaleString('es-CL') : '';
+  });
+
+  document.getElementById('btn-solicitar').addEventListener('click', solicitar);
+  async function solicitar() {
+    const monto = Number(inputMonto.value.replace(/\D/g, ''));
+    const fb = document.getElementById('solicitar-feedback');
+    if (!monto || monto <= 0) { fb.textContent = 'Ingresa un monto'; fb.className = 'feedback error'; inputMonto.focus(); return; }
+    if (monto > sesion.tope) { fb.textContent = 'Supera tu máximo de ' + clp(sesion.tope); fb.className = 'feedback error'; return; }
+    fb.textContent = 'Enviando…'; fb.className = 'feedback';
+    const btn = document.getElementById('btn-solicitar'); btn.disabled = true;
+    let resp;
+    try { resp = await apiPost('solicitar', { nombre: sesion.nombre, pin: sesion.pin, monto }); }
+    catch (e) { fb.textContent = 'Error de conexión'; fb.className = 'feedback error'; btn.disabled = false; return; }
+    btn.disabled = false;
+    if (!resp.success) { fb.textContent = resp.message || 'No se pudo registrar'; fb.className = 'feedback error'; return; }
+    /* Mostrar confirmación */
+    document.getElementById('form-card').classList.add('hidden');
+    const confCard = document.getElementById('confirmada-card');
+    confCard.classList.remove('hidden');
+    document.getElementById('conf-monto').textContent = clp(resp.solicitud.monto);
+    document.getElementById('conf-info').textContent = `${sesion.nombre} · RUT ${sesion.rut} · solicitado el ${resp.solicitud.fecha}`;
+  }
+
+  /* ── Salir ── */
+  document.getElementById('btn-salir').addEventListener('click', () => {
+    sesion = { nombre:'', pin:'', rut:'', rol:'', tope:0, esAdmin:false };
+    document.getElementById('input-pin').value = '';
+    document.getElementById('app-panel').classList.add('hidden');
+    document.getElementById('login-panel').classList.remove('hidden');
+    document.getElementById('header-user').classList.remove('show');
+    document.getElementById('login-feedback').textContent = '';
+  });
+
+  /* ── Admin: exportar ── */
+  document.getElementById('btn-cargar-export').addEventListener('click', cargarExport);
+  async function cargarExport() {
+    const fb = document.getElementById('admin-feedback');
+    fb.textContent = 'Cargando…'; fb.className = 'feedback';
+    let resp;
+    try { resp = await apiPost('exportar', { nombre: sesion.nombre, pin: sesion.pin }); }
+    catch (e) { fb.textContent = 'Error de conexión'; fb.className = 'feedback error'; return; }
+    if (!resp.success) { fb.textContent = resp.message || 'No se pudo cargar'; fb.className = 'feedback error'; return; }
+    fb.textContent = '';
+    ultimoExport = resp.registros || [];
+    const body = document.getElementById('export-body');
+    body.innerHTML = ultimoExport.length ? ultimoExport.map(r =>
+      `<tr><td>${esc(r.fecha)}</td><td>${esc(r.nombre)}</td><td style="font-family:monospace">${esc(r.rut)}</td><td>${esc(r.cargo)}</td><td class="monto">${clp(r.monto)}</td></tr>`
+    ).join('') : '<tr><td colspan="5" class="muted">Sin solicitudes registradas</td></tr>';
+    document.getElementById('export-count').textContent = ultimoExport.length + (ultimoExport.length === 1 ? ' solicitud' : ' solicitudes');
+    document.getElementById('export-tabla-wrap').classList.remove('hidden');
+    document.getElementById('btn-descargar-csv').classList.toggle('hidden', !ultimoExport.length);
+  }
+
+  document.getElementById('btn-descargar-csv').addEventListener('click', () => {
+    if (!ultimoExport.length) return;
+    const sep = ';';
+    const cab = ['Fecha Solicitud','Nombre','RUT','Cargo','Monto Solicitado','Periodo'];
+    const lineas = [cab.join(sep)];
+    ultimoExport.forEach(r => {
+      lineas.push([r.fecha, r.nombre, r.rut, r.cargo, r.monto, r.periodo || ''].map(x => {
+        const s = String(x == null ? '' : x);
+        return /[";\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+      }).join(sep));
+    });
+    const hoy = new Date();
+    const nombre = 'anticipos-' + hoy.getFullYear() + '-' + String(hoy.getMonth()+1).padStart(2,'0') + '.csv';
+    const blob = new Blob(['\ufeff' + lineas.join('\r\n')], { type:'text/csv;charset=utf-8;' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = nombre;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  });
+
+  /* ── Arranque ── */
+  cargarColaboradores();
+  </script>
+</body>
+</html>
